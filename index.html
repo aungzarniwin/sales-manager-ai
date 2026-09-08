@@ -59,11 +59,6 @@ body {
     padding: 25px;
     border-radius: 15px;
     box-shadow: 0 3px 12px rgba(0,0,0,0.08);
-    cursor: pointer;
-}
-
-.card:hover {
-    transform: translateY(-3px);
 }
 
 .icon {
@@ -125,10 +120,24 @@ button:hover {
     opacity: 0.9;
 }
 
-.result {
+.results {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 12px;
     margin-top: 20px;
-    font-size: 20px;
-    font-weight: bold;
+}
+
+.result-box {
+    background: #f9fafb;
+    padding: 18px;
+    border-radius: 10px;
+    text-align: center;
+}
+
+.result-box strong {
+    display: block;
+    font-size: 21px;
+    margin-top: 8px;
 }
 
 .footer {
@@ -166,7 +175,7 @@ button:hover {
         <div class="card">
             <div class="icon">🎯</div>
             <h3>Sales Target</h3>
-            <p>Calculate daily, weekly and monthly sales targets.</p>
+            <p>Track your sales target and achievement.</p>
         </div>
 
         <div class="card">
@@ -195,9 +204,10 @@ button:hover {
 
     </div>
 
+
     <div class="section">
 
-        <h2>🎯 Sales Target Calculator</h2>
+        <h2>🎯 Sales Performance Calculator</h2>
 
         <div class="calculator">
 
@@ -209,7 +219,15 @@ button:hover {
                 placeholder="Example: 10000000"
             >
 
-            <label>Working Days</label>
+            <label>Actual Sales (MMK)</label>
+
+            <input
+                type="number"
+                id="actualSales"
+                placeholder="Example: 6500000"
+            >
+
+            <label>Total Working Days</label>
 
             <input
                 type="number"
@@ -217,11 +235,42 @@ button:hover {
                 placeholder="Example: 26"
             >
 
-            <button onclick="calculateTarget()">
-                Calculate Daily Target
+            <label>Days Passed</label>
+
+            <input
+                type="number"
+                id="daysPassed"
+                placeholder="Example: 16"
+            >
+
+            <button onclick="calculateSales()">
+                📊 Calculate Performance
             </button>
 
-            <div class="result" id="result"></div>
+
+            <div class="results">
+
+                <div class="result-box">
+                    Achievement
+                    <strong id="achievement">-</strong>
+                </div>
+
+                <div class="result-box">
+                    Remaining Target
+                    <strong id="remaining">-</strong>
+                </div>
+
+                <div class="result-box">
+                    Daily Required
+                    <strong id="dailyRequired">-</strong>
+                </div>
+
+                <div class="result-box">
+                    Daily Average
+                    <strong id="dailyAverage">-</strong>
+                </div>
+
+            </div>
 
         </div>
 
@@ -229,34 +278,89 @@ button:hover {
 
 </div>
 
+
 <div class="footer">
     AI Sales Manager © 2026
 </div>
 
+
 <script>
 
-function calculateTarget() {
+function calculateSales() {
 
     let target =
         Number(document.getElementById("monthlyTarget").value);
 
-    let days =
+    let actual =
+        Number(document.getElementById("actualSales").value);
+
+    let workingDays =
         Number(document.getElementById("workingDays").value);
 
-    if (target <= 0 || days <= 0) {
+    let daysPassed =
+        Number(document.getElementById("daysPassed").value);
 
-        document.getElementById("result").innerHTML =
-        "⚠️ Please enter valid numbers.";
+
+    if (
+        target <= 0 ||
+        actual < 0 ||
+        workingDays <= 0 ||
+        daysPassed <= 0 ||
+        daysPassed > workingDays
+    ) {
+
+        alert("Please enter valid information.");
 
         return;
     }
 
-    let dailyTarget = target / days;
 
-    document.getElementById("result").innerHTML =
-    "🎯 Daily Target: " +
-    dailyTarget.toLocaleString() +
-    " MMK";
+    let achievement =
+        (actual / target) * 100;
+
+
+    let remaining =
+        Math.max(target - actual, 0);
+
+
+    let remainingDays =
+        workingDays - daysPassed;
+
+
+    let dailyRequired =
+        remainingDays > 0
+        ? remaining / remainingDays
+        : remaining;
+
+
+    let dailyAverage =
+        actual / daysPassed;
+
+
+    document.getElementById("achievement").innerHTML =
+        achievement.toFixed(1) + "%";
+
+
+    document.getElementById("remaining").innerHTML =
+        remaining.toLocaleString() + " MMK";
+
+
+    document.getElementById("dailyRequired").innerHTML =
+        dailyRequired.toLocaleString(
+            undefined,
+            {
+                maximumFractionDigits: 0
+            }
+        ) + " MMK";
+
+
+    document.getElementById("dailyAverage").innerHTML =
+        dailyAverage.toLocaleString(
+            undefined,
+            {
+                maximumFractionDigits: 0
+            }
+        ) + " MMK";
 
 }
 
