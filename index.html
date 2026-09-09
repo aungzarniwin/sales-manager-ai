@@ -288,7 +288,7 @@ button:hover {
     AI Sales Manager © 2026
 </div>
 
-async function askAI() {
+ {
 
 const question = document.getElementById("salesQuestion").value;
 const answerBox = document.getElementById("aiAnswer");
@@ -411,7 +411,41 @@ function calculateSales() {
 
 }
 
-</script>
+</script> async function askAI() {
+const question = document.getElementById("salesQuestion").value;
+const answerBox = document.getElementById("aiAnswer");
+
+if (!question.trim()) {
+answerBox.innerHTML = "Please enter your sales question.";
+return;
+}
+
+answerBox.innerHTML = "🤖 AI is thinking...";
+
+try {
+const response = await fetch(
+"https://ai-sales-manager.agzarniwin.workers.dev",
+{
+method: "POST",
+headers: {
+"Content-Type": "application/json"
+},
+body: JSON.stringify({ question: question })
+}
+);
+
+const data = await response.json();
+
+if (data.answer) {
+answerBox.innerHTML = data.answer;
+} else {
+answerBox.innerHTML = "❌ AI could not answer.";
+}
+
+} catch (error) {
+answerBox.innerHTML = "❌ Connection error. Please try again.";
+}
+}
 
 </body>
 </html>
