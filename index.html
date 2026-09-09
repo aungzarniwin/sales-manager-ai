@@ -326,7 +326,7 @@ answerBox.innerHTML = "❌ AI could not answer.";
 } catch (error) {
 
 answerBox.innerHTML =
-"❌ Connection error. Please try again.";
+"❌ Error: " + error.message;
 
 }
 }
